@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {
   getBottlesByDate,
   getLatestBottle,
-} from "../models/bottle-model";
+} from "../api/bottle-api";
 
 const ML_PER_OZ = 29.5735295625;
 
@@ -104,7 +104,7 @@ function HomePage({ user, onLogBottle }) {
                 <h3>Latest bottle</h3>
 
                 <p>
-                  {latestBottle.startTime.toDate().toLocaleString([], {
+                  {new Date(latestBottle.startTime).toLocaleString([], {
                     year: "numeric",
                     month: "short",
                     day: "numeric",

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createBottle } from "../models/bottle-model";
+import { createBottle } from "../api/bottle-api";
 
 function LogBottlePage({ onBack }) {
   const [date, setDate] = useState(() => {

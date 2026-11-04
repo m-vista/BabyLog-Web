@@ -1,48 +1,76 @@
 import { useEffect, useState } from "react";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "./firebase";
+import { getCurrentUser, logoutUser } from "./api/auth-api";
 import Navigation from "./components/Navigation";
 import LoginPage from "./pages/LoginPage";
 import CreateAccountPage from "./pages/CreateAccountPage";
 import HomePage from "./pages/HomePage";
 import LogBottlePage from "./pages/LogBottlePage";
-import EditBottlePage from "./pages/EditBottlePage";
 import TimelinePage from "./pages/TimelinePage";
+import EditBottlePage from "./pages/EditBottlePage";
 import "./App.css";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [loggingOut, setLoggingOut] = useState(false);
-  const [logoutError, setLogoutError] = useState("");
   const [loading, setLoading] = useState(true);
   const [showCreateAccount, setShowCreateAccount] = useState(false);
   const [page, setPage] = useState("home");
   const [selectedBottle, setSelectedBottle] = useState(null);
   const [timelineDate, setTimelineDate] = useState("");
+  const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    let active = true;
+
+    async function checkSession() {
+      try {
+        const currentUser = await getCurrentUser();
+
+        if (active) {
+          setUser(currentUser);
+        }
+      } catch {
+        if (active) {
+          setMessage("Cannot reach the backend. Check that it is running.");
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    checkSession();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  function handleLogin(currentUser) {
+    setUser(currentUser);
+    setShowCreateAccount(false);
+    setPage("home");
+    setSelectedBottle(null);
+    setTimelineDate("");
+    setMessage("");
+  }
+
+  async function handleLogout() {
+    setMessage("");
+    setBusy(true);
+
+    try {
+      await logoutUser();
+      setUser(null);
       setShowCreateAccount(false);
-      setLoading(false);
       setPage("home");
       setSelectedBottle(null);
       setTimelineDate("");
-    });
-
-    return unsubscribe;
-  }, []);
-
-  async function handleLogout() {
-    setLogoutError("");
-    setLoggingOut(true);
-
-    try {
-      await signOut(auth);
-    } catch {
-      setLogoutError("Could not log out. Please try again.");
+    } catch (error) {
+      setMessage(error.message);
     } finally {
-      setLoggingOut(false);
+      setBusy(false);
     }
   }
 
@@ -71,7 +99,6 @@ function App() {
       currentPage = (
         <TimelinePage
           initialDate={timelineDate}
-          onBack={() => setPage("home")}
           onEdit={(bottle, date) => {
             setSelectedBottle(bottle);
             setTimelineDate(date);
@@ -95,35 +122,33 @@ function App() {
           onHome={() => setPage("home")}
           onTimeline={() => setPage("timeline")}
           onLogout={handleLogout}
-          busy={loggingOut}
+          busy={busy}
         />
 
         <div className="app-content">
-          {logoutError && (
-            <p className="logout-error" role="alert">
-              {logoutError}
-            </p>
-          )}
-
+          {message && <p role="alert">{message}</p>}
           {currentPage}
         </div>
       </div>
     );
   }
 
-
-  if (showCreateAccount) {
-    return (
-      <CreateAccountPage
-        onBack={() => setShowCreateAccount(false)}
-      />
-    );
-  }
-
   return (
-    <LoginPage
-      onCreateAccount={() => setShowCreateAccount(true)}
-    />
+    <>
+      {message && <p role="alert">{message}</p>}
+
+      {showCreateAccount ? (
+        <CreateAccountPage
+          onBack={() => setShowCreateAccount(false)}
+          onLogin={handleLogin}
+        />
+      ) : (
+        <LoginPage
+          onCreateAccount={() => setShowCreateAccount(true)}
+          onLogin={handleLogin}
+        />
+      )}
+    </>
   );
 }
 

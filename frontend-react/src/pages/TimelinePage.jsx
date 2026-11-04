@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getBottlesByDate } from "../models/bottle-model";
+import { getBottlesByDate } from "../api/bottle-api";
 
 function formatDate(date) {
   const year = date.getFullYear();
@@ -122,7 +122,7 @@ function TimelinePage({ onEdit, initialDate }) {
             return (
               <li key={bottle.id} className="bottle-entry">
                 <p>
-                  {bottle.startTime.toDate().toLocaleTimeString([], {
+                  {new Date(bottle.startTime).toLocaleTimeString([], {
                     hour: "numeric",
                     minute: "2-digit",
                   })}

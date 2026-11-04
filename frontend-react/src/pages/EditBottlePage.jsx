@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { Timestamp } from "firebase/firestore";
-import { updateBottle } from "../models/bottle-model";
+import { updateBottle } from "../api/bottle-api";
 
 const ML_PER_OZ = 29.5735295625;
 
 function EditBottlePage({ bottle, onBack }) {
-  const originalDate = bottle.startTime.toDate();
+  const originalDate = new Date(bottle.startTime);
 
   const initialDate = [
     originalDate.getFullYear(),
@@ -48,9 +47,7 @@ function EditBottlePage({ bottle, onBack }) {
       const changes = {};
 
       if (date !== initialDate || time !== initialTime) {
-        changes.startTime = Timestamp.fromDate(
-          new Date(`${date}T${time}`)
-        );
+        changes.startTime = new Date(`${date}T${time}`).toISOString();
       }
 
       if (Number(breastMilkOz) !== Number(initialBreastMilk)) {

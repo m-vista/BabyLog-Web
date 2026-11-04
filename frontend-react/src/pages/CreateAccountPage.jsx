@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "../firebase";
+import { createUser } from "../api/auth-api";
 
-function CreateAccount({ onBack }) {
+function CreateAccount({ onBack, onLogin }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,21 +26,10 @@ function CreateAccount({ onBack }) {
     setBusy(true);
 
     try {
-      const result = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      await updateProfile(result.user, {
-        displayName: name.trim(),
-      });
+      const user = await createUser(name, email, password);
+      onLogin(user);
     } catch (error) {
-      if (error.code === "auth/email-already-in-use") {
-        setMessage("This email already has an account. Please log in.");
-      } else {
-        setMessage("Could not finish creating your account. Try logging in or retry.");
-      }
+      setMessage(error.message);
     } finally {
       setBusy(false);
     }

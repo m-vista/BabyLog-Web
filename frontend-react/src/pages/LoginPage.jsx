@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { loginUser } from "../api/auth-api";
 
-function LoginPage({ onCreateAccount }) {
+function LoginPage({ onCreateAccount, onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -14,9 +13,10 @@ function LoginPage({ onCreateAccount }) {
     setBusy(true);
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch {
-      setMessage("Could not log in. Check your email and password.");
+      const user = await loginUser(email, password);
+      onLogin(user);
+    } catch (error) {
+      setMessage(error.message);
     } finally {
       setBusy(false);
     }
