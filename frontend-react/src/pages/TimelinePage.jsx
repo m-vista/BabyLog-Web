@@ -79,74 +79,109 @@ function TimelinePage({ onEdit, initialDate }) {
     selectDate(formatDate(nextDate));
   }
 
+  const totalOz = bottles.reduce((total, bottle) => {
+    return total +
+      bottle.breastMilkAmountMl +
+      bottle.formulaAmountMl +
+      bottle.unspecifiedAmountMl;
+  }, 0) / 29.5735295625;
+
   return (
-    <main>
-      <h1>Timeline</h1>
+    <main className="timeline-page">
+      <header className="page-header">
+        <h1>Timeline</h1>
 
-      <div  className="timeline-controls">
-        <button onClick={() => changeDay(-1)}>
-          Previous day
-        </button>
+        <div className="timeline-controls">
+          <button
+            type="button"
+            aria-label="Previous day"
+            onClick={() => changeDay(-1)}
+          >
+            ‹
+          </button>
 
-        <label htmlFor="timeline-date">Date</label>
-        <input
-          id="timeline-date"
-          type="date"
-          value={date}
-          onChange={(event) => selectDate(event.target.value)}
-        />
+          <input
+            aria-label="Timeline date"
+            type="date"
+            value={date}
+            onChange={(event) => selectDate(event.target.value)}
+          />
 
-        <button onClick={() => changeDay(1)}>
-          Next day
-        </button>
-      </div>
+          <button
+            type="button"
+            aria-label="Next day"
+            onClick={() => changeDay(1)}
+          >
+            ›
+          </button>
+        </div>
+      </header>
 
-      {loading && <p role="status">Loading...</p>}
+      <div className="timeline-body">
+        <div className="timeline-summary">
+          <h2>
+            {new Date(`${date}T12:00:00`).toLocaleDateString([], {
+              weekday: "long",
+              month: "short",
+              day: "numeric",
+            })}
+          </h2>
 
-      <p role="status">{message}</p>
+          {!loading && !message && (
+            <p>
+              {bottles.length} bottles · {totalOz.toFixed(2)} oz
+            </p>
+          )}
+        </div>
 
-      {!loading && !message && bottles.length === 0 && (
-        <p>No bottle feeds for this date.</p>
-      )}
+        {loading && <p role="status">Loading...</p>}
 
-      {!loading && !message && (
-        <ul className="bottle-list">
-          {bottles.map((bottle) => {
-            const totalMl =
-              bottle.breastMilkAmountMl +
-              bottle.formulaAmountMl +
-              bottle.unspecifiedAmountMl;
+        {message && <p role="alert">{message}</p>}
 
-            const totalOz = totalMl / 29.5735295625;
+        {!loading && !message && bottles.length === 0 && (
+          <p>No bottle feeds for this date.</p>
+        )}
 
-            return (
-              <li key={bottle.id} className="bottle-entry">
-                <p>
-                  {new Date(bottle.startTime).toLocaleTimeString([], {
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
-                  {" — "}
-                  {getMilkType(bottle)}
-                  {" — "}
-                  {totalOz.toFixed(2)} oz
-                </p>
+        {!loading && !message && (
+          <ul className="bottle-list">
+            {bottles.map((bottle) => {
+              const amountOz = (
+                bottle.breastMilkAmountMl +
+                bottle.formulaAmountMl +
+                bottle.unspecifiedAmountMl
+              ) / 29.5735295625;
 
-                {bottle.notes && <p>{bottle.notes}</p>}
+              return (
+                <li key={bottle.id} className="bottle-entry">
+                  <span className="entry-time">
+                    {new Date(bottle.startTime).toLocaleTimeString([], {
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </span>
 
-                <button
+                  <div className="entry-details">
+                    <p>
+                      {getMilkType(bottle)} {amountOz.toFixed(2)} oz
+                    </p>
+
+                    {bottle.notes && (
+                      <p className="entry-note">{bottle.notes}</p>
+                    )}
+                  </div>
+
+                  <button
                     type="button"
                     onClick={() => onEdit(bottle, date)}
-                >
+                  >
                     More / Edit
-                </button>
-
-              </li>
-            );
-          })}
-        </ul>
-      )}
-
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
     </main>
   );
 }

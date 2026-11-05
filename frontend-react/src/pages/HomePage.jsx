@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import bottleImage from "../assets/bottle.png";
 import {
   getBottlesByDate,
   getLatestBottle,
@@ -86,57 +87,79 @@ function HomePage({ user, onLogBottle }) {
     ) / ML_PER_OZ;
 
   return (
-    <main>
-      <h1>Welcome to BabyLog</h1>
-      <p>You are logged in as {user.email}.</p>
+    <main className="home-page">
+      <header className="page-header">
+        <h1>Welcome, {user.name}!</h1>
 
-      <section className="bottle-card" aria-labelledby="bottle-heading">
-        <h2 id="bottle-heading">Bottle feeding</h2>
+        <p>
+          {new Date().toLocaleDateString([], {
+            weekday: "long",
+            month: "short",
+            day: "numeric",
+          })}
+        </p>
+      </header>
 
-        {loading && <p role="status">Loading bottle information...</p>}
+      <div className="home-body">
+        <h2 className="section-heading">
+          add activity
+        </h2>
 
-        {loadError && <p role="status">{loadError}</p>}
+        <section
+          className="bottle-card"
+          aria-label="Bottle feeding summary"
+        >
+          <img
+            className="bottle-decoration"
+            src={bottleImage}
+            alt=""
+            aria-hidden="true"
+          />
+          <div className="bottle-card-top">
+            <div>
+              {loading && <p role="status">Loading...</p>}
+              {loadError && <p role="status">{loadError}</p>}
 
-        {!loading && !loadError && (
-          <>
-            {latestBottle ? (
-              <>
-                <h3>Latest bottle</h3>
+              {!loading && !loadError && (
+                latestBottle ? (
+                  <>
+                    <p className="bottle-time">
+                      {new Date(latestBottle.startTime).toLocaleString([], {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </p>
 
-                <p>
-                  {new Date(latestBottle.startTime).toLocaleString([], {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
-                </p>
+                    <h3>
+                      {getMilkType(latestBottle)}{" "}
+                      {(getTotalMl(latestBottle) / ML_PER_OZ).toFixed(2)} oz
+                    </h3>
+                  </>
+                ) : (
+                  <h3>No bottle feeds yet</h3>
+                )
+              )}
+            </div>
+          </div>
 
-                <p>
-                  {getMilkType(latestBottle)}
-                  {" — "}
-                  {(getTotalMl(latestBottle) / ML_PER_OZ).toFixed(2)} oz
-                </p>
-              </>
-            ) : (
-              <p>No bottle feeds yet.</p>
+          <div className="bottle-card-bottom">
+            {!loading && !loadError && (
+              <p>
+                Today: {todayBottles.length}{" "}
+                {todayBottles.length === 1 ? "bottle" : "bottles"}
+                {" · "}
+                {todayTotalOz.toFixed(2)} oz
+              </p>
             )}
 
-            <h3>Today</h3>
-            <p>
-              {todayBottles.length} bottles
-              {" — "}
-              {todayTotalOz.toFixed(2)} oz total
-            </p>
-          </>
-        )}
-
-        <button type="button" onClick={onLogBottle}>
-          + Log Bottle
-        </button>
-      </section>
-
+            <button type="button" onClick={onLogBottle}>
+              + Log Bottle
+            </button>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

@@ -33,14 +33,27 @@ function EditBottlePage({ bottle, onBack }) {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const totalOz =
-    Number(breastMilkOz) +
-    Number(formulaOz) +
-    bottle.unspecifiedAmountMl / ML_PER_OZ;
+  const breastMilk = Number(breastMilkOz);
+  const formula = Number(formulaOz);
+  const unspecifiedOz = bottle.unspecifiedAmountMl / ML_PER_OZ;
+  const total = breastMilk + formula + unspecifiedOz;
 
   async function handleSave(event) {
     event.preventDefault();
     setMessage("");
+
+    if (
+      !Number.isFinite(breastMilk) ||
+      !Number.isFinite(formula) ||
+      breastMilk < 0 ||
+      formula < 0 ||
+      !Number.isFinite(total) ||
+      total <= 0
+    ) {
+      setMessage("Enter a valid milk amount greater than zero.");
+      return;
+    }
+
     setBusy(true);
 
     try {
@@ -50,12 +63,12 @@ function EditBottlePage({ bottle, onBack }) {
         changes.startTime = new Date(`${date}T${time}`).toISOString();
       }
 
-      if (Number(breastMilkOz) !== Number(initialBreastMilk)) {
-        changes.breastMilkAmountMl = Number(breastMilkOz) * ML_PER_OZ;
+      if (breastMilk !== Number(initialBreastMilk)) {
+        changes.breastMilkAmountMl = breastMilk * ML_PER_OZ;
       }
 
-      if (Number(formulaOz) !== Number(initialFormula)) {
-        changes.formulaAmountMl = Number(formulaOz) * ML_PER_OZ;
+      if (formula !== Number(initialFormula)) {
+        changes.formulaAmountMl = formula * ML_PER_OZ;
       }
 
       if (notes !== bottle.notes) {
@@ -65,71 +78,87 @@ function EditBottlePage({ bottle, onBack }) {
       await updateBottle(bottle.id, changes);
       onBack();
     } catch (error) {
-      setMessage(
-        error.code
-          ? "Could not save changes. Please try again."
-          : error.message
-      );
+      setMessage(error.message);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <main>
+    <main className="bottle-form-page">
       <h1>Edit bottle</h1>
 
-      <form onSubmit={handleSave}>
-        <div>
-          <label htmlFor="edit-date">Date *</label>
-          <input
-            id="edit-date"
-            type="date"
-            value={date}
-            onChange={(event) => setDate(event.target.value)}
-            required
-          />
+      <form className="bottle-form" onSubmit={handleSave}>
+        <div className="date-time-row">
+          <div>
+            <label htmlFor="edit-date">Date *</label>
+            <input
+              id="edit-date"
+              type="date"
+              value={date}
+              onChange={(event) => setDate(event.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="edit-time">Time *</label>
+            <input
+              id="edit-time"
+              type="time"
+              value={time}
+              onChange={(event) => setTime(event.target.value)}
+              required
+            />
+          </div>
         </div>
 
-        <div>
-          <label htmlFor="edit-time">Time *</label>
-          <input
-            id="edit-time"
-            type="time"
-            value={time}
-            onChange={(event) => setTime(event.target.value)}
-            required
-          />
+        <div className="amount-row">
+          <div className="amount-box">
+            <label htmlFor="edit-breast-milk">Breast milk (oz)</label>
+            <input
+              id="edit-breast-milk"
+              type="number"
+              min="0"
+              step="0.25"
+              placeholder="0"
+              value={breastMilkOz}
+              onChange={(event) => setBreastMilkOz(event.target.value)}
+            />
+          </div>
+
+          <div className="amount-box">
+            <label htmlFor="edit-formula">Formula (oz)</label>
+            <input
+              id="edit-formula"
+              type="number"
+              min="0"
+              step="0.25"
+              placeholder="0"
+              value={formulaOz}
+              onChange={(event) => setFormulaOz(event.target.value)}
+            />
+          </div>
+
+          <div className="amount-box amount-total">
+            <label htmlFor="edit-total">Total (oz) — AUTO</label>
+            <input
+              id="edit-total"
+              type="text"
+              value={total.toFixed(2)}
+              readOnly
+            />
+          </div>
         </div>
 
-        <div>
-          <label htmlFor="edit-breast-milk">Breast milk (oz) *</label>
-          <input
-            id="edit-breast-milk"
-            type="number"
-            min="0"
-            step="0.01"
-            value={breastMilkOz}
-            onChange={(event) => setBreastMilkOz(event.target.value)}
-            required
-          />
-        </div>
+        <p>Enter at least one milk amount. Empty boxes count as zero.</p>
 
-        <div>
-          <label htmlFor="edit-formula">Formula (oz) *</label>
-          <input
-            id="edit-formula"
-            type="number"
-            min="0"
-            step="0.01"
-            value={formulaOz}
-            onChange={(event) => setFormulaOz(event.target.value)}
-            required
-          />
-        </div>
-
-        <p>Total: {totalOz.toFixed(2)} oz</p>
-        <p>Use 0 for a milk type that was not included.</p>
+        {unspecifiedOz > 0 && (
+          <p>
+            Total also includes {unspecifiedOz.toFixed(2)} oz of
+            previously saved unspecified milk.
+          </p>
+        )}
 
         <div>
           <label htmlFor="edit-notes">Note</label>
@@ -141,17 +170,18 @@ function EditBottlePage({ bottle, onBack }) {
         </div>
 
         <p>* Required fields</p>
+        <p role="status">{message}</p>
 
-        <button type="submit" disabled={busy}>
-          {busy ? "Saving..." : "Save Changes"}
-        </button>
+        <div className="form-actions">
+          <button type="button" onClick={onBack} disabled={busy}>
+            Cancel
+          </button>
 
-        <button type="button" onClick={onBack} disabled={busy}>
-          Cancel
-        </button>
+          <button type="submit" disabled={busy}>
+            {busy ? "Saving..." : "Save Changes"}
+          </button>
+        </div>
       </form>
-
-      <p role="status">{message}</p>
     </main>
   );
 }

@@ -1,3 +1,5 @@
+import logoutIcon from "../assets/logout.png";
+
 function Navigation({
   page,
   onHome,
@@ -38,6 +40,7 @@ function Navigation({
         onClick={onLogout}
         disabled={busy}
       >
+        <img src={logoutIcon} alt="" className="logout-icon" />
         {busy ? "Logging out..." : "Log out"}
       </button>
     </nav>
