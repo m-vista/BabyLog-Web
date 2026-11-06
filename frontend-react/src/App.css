@@ -336,14 +336,14 @@
 }
 
 
-/* Bottle forms */
+/* Form panel */
 
 .bottle-form-page h1 {
-  margin-top: 0;
+  margin: 0 0 20px;
   font-size: 26px;
 }
 
-.bottle-form {
+.bottle-form-page .bottle-form {
   width: 100%;
   max-width: 560px;
   padding: 24px;
@@ -352,47 +352,112 @@
   background: white;
 }
 
-.bottle-form label {
+.bottle-form-page .bottle-form label {
   font-size: 13px;
 }
 
-.bottle-form input,
-.bottle-form textarea {
+.bottle-form-page .bottle-form input,
+.bottle-form-page .bottle-form textarea {
   border-color: #d8cec7;
   font-size: 14px;
 }
 
-.bottle-form p {
-  font-size: 13px;
+.bottle-form-page .bottle-form p {
+  font-size: 12px;
 }
 
+/* Date and time */
 
-/* Date and time fields */
-
-.date-time-row {
+.bottle-form-page .date-time-row {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
+  margin-bottom: 20px;
   padding: 16px;
   border-radius: 8px;
   background: #f8ebdf;
 }
 
-.date-time-row > div {
+.bottle-form-page .date-time-row > div {
   flex: 1;
   min-width: 120px;
 }
 
+/* Required sections */
 
-/* Milk amount fields */
+.bottle-form .bottle-section {
+  min-width: 0;
+  margin: 0 0 20px;
+  padding: 0;
+  border: none;
+}
 
-.amount-row {
+.bottle-form .bottle-section legend {
+  margin-bottom: 8px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+/* Milk type tabs */
+
+.bottle-form .type-options {
+  display: flex;
+  gap: 0;
+  border: 1px solid #d8cec7;
+  border-radius: 8px;
+}
+
+.bottle-form .type-tab {
+  position: relative;
+  flex: 1;
+  margin: 0;
+  padding: 10px 8px;
+  border-right: 1px solid #d8cec7;
+  background: white;
+  color: #50382c;
+  text-align: center;
+  cursor: pointer;
+}
+
+.bottle-form .type-tab:first-child {
+  border-radius: 7px 0 0 7px;
+}
+
+.bottle-form .type-tab:last-child {
+  border-right: none;
+  border-radius: 0 7px 7px 0;
+}
+
+.bottle-form .type-tab.selected {
+  background: #50382c;
+  color: white;
+}
+
+.bottle-form .type-tab input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+}
+
+.bottle-form .type-tab:focus-within {
+  z-index: 1;
+  outline: 3px solid #92521f;
+  outline-offset: 3px;
+}
+
+/* Amount boxes */
+
+.bottle-form-page .amount-row {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
 }
 
-.amount-box {
+.bottle-form-page .amount-box {
   flex: 1;
   min-width: 120px;
   padding: 12px;
@@ -400,11 +465,12 @@
   border-radius: 8px;
 }
 
-.amount-box label {
+.bottle-form-page .amount-box label {
   font-size: 12px;
 }
 
-.bottle-form .amount-box input {
+.bottle-form-page .bottle-form .amount-box input {
+  width: 100%;
   padding: 8px 0;
   border: none;
   background: transparent;
@@ -412,14 +478,21 @@
   font-weight: bold;
 }
 
-.amount-total {
+.bottle-form-page .amount-total {
   background: #f3ece7;
 }
 
+.bottle-form .form-hint {
+  color: #776f6a;
+}
 
-/* Form buttons */
+.bottle-form .form-error {
+  color: #a12622;
+}
 
-.bottle-form .form-actions {
+/* Save and cancel */
+
+.bottle-form-page .bottle-form .form-actions {
   display: flex;
   justify-content: flex-end;
   flex-wrap: wrap;
@@ -427,21 +500,23 @@
   margin: 24px 0 0;
 }
 
-.form-actions button {
+.bottle-form-page .form-actions button {
   margin: 0;
+  padding: 10px 16px;
   border-radius: 20px;
   font-size: 13px;
 }
 
-.form-actions button[type="submit"] {
+.bottle-form-page .form-actions button[type="submit"] {
   border-color: #50382c;
   background: #50382c;
   color: white;
 }
 
-.form-actions button[type="submit"]:hover:not(:disabled) {
+.bottle-form-page .form-actions button[type="submit"]:hover:not(:disabled) {
   background: #694a3a;
 }
+
 
 /* Login and create account */
 
@@ -589,7 +664,7 @@
     padding: 20px;
   }
 
-  .bottle-form {
+  .bottle-form-page .bottle-form {
     padding: 16px;
   }
   
