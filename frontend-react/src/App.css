@@ -443,6 +443,108 @@
   background: #694a3a;
 }
 
+/* Login and create account */
+
+.auth-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.auth-intro {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 60px;
+  overflow: hidden;
+  background: #50382c;
+  color: white;
+}
+
+.auth-brand {
+  position: absolute;
+  top: 28px;
+  left: 40px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.auth-intro h1 {
+  position: relative;
+  z-index: 1;
+  max-width: 360px;
+  font-size: 36px;
+  line-height: 1.2;
+}
+
+.auth-bottle {
+  position: absolute;
+  right: 40px;
+  bottom: 15%;
+  width: 220px;
+  filter: brightness(0) invert(1);
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.auth-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  background: white;
+}
+
+.auth-content {
+  width: 100%;
+  max-width: 360px;
+}
+
+.auth-content h2 {
+  margin: 0 0 24px;
+  font-size: 24px;
+}
+
+.auth-content label {
+  font-size: 13px;
+}
+
+.auth-content input {
+  border-color: #d8cec7;
+}
+
+.auth-content p {
+  font-size: 12px;
+}
+
+.auth-content button[type="submit"] {
+  width: 100%;
+  margin: 8px 0 0;
+  border: none;
+  border-radius: 24px;
+  background: #50382c;
+  color: white;
+}
+
+.auth-content button[type="submit"]:hover:not(:disabled) {
+  background: #694a3a;
+}
+
+.auth-switch {
+  width: 100%;
+  margin-top: 16px;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  color: #92521f;
+  font-size: 13px;
+}
 
 /* Small screens */
 
@@ -489,5 +591,34 @@
 
   .bottle-form {
     padding: 16px;
+  }
+  
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-intro {
+    min-height: 240px;
+    padding: 60px 24px 24px;
+  }
+
+  .auth-brand {
+    top: 20px;
+    left: 24px;
+  }
+
+  .auth-intro h1 {
+    max-width: 260px;
+    font-size: 28px;
+  }
+
+  .auth-bottle {
+    right: 20px;
+    bottom: 15px;
+    width: 120px;
+  }
+
+  .auth-panel {
+    padding: 32px 24px;
   }
 }
